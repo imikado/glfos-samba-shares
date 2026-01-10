@@ -7,6 +7,7 @@ GUI to manage samba shares on glfos
 - **Edit Shares**: Modify existing share configurations
 - **List Shares**: View all configured Samba shares
 - **NixOS Integration**: Automatically updates `/etc/nixos/customConfig/default.nix`
+- **Nix Parser**: Uses `rnix` library to parse nix config file
 - **User/Group Selection**: Choose from system users and groups
 - **Path Browser**: Native folder picker for share paths
 - **Validation**: Form validation for required fields

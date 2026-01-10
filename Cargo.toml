@@ -16,6 +16,7 @@ regex = "1.10"
 anyhow = "1.0"
 thiserror = "1.0"
 once_cell = "1.19"
+rnix = "0.11"
 
 
 [profile.release]

@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Samba-shares
+GenericName=Samba shares Manager
+X-GNOME-FullName=Samba-shares
+Comment=Manage your samba shares on NixOS
+Exec=pkexec /run/current-system/sw/bin/samba-shares
+Icon=samba-shares
+Terminal=false
+Type=Application
+Categories=GNOME;System;Filesystem;
+Keywords=Samba;
+StartupNotify=true
+StartupWMClass=org.glfos.sambashares

@@ -75,7 +75,7 @@ impl EditShareDialog {
 
         // User/Group Settings Group
         let user_group_group = adw::PreferencesGroup::new();
-        user_group_group.set_title(&gettext("User & Group Settings"));
+        user_group_group.set_title(&gettext("User &amp; Group Settings"));
 
         // Force User dropdown
         let force_user_combo = adw::ComboRow::new();

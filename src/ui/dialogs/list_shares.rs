@@ -77,7 +77,7 @@ impl ListSharesDialog {
                         // User/Group row
                         let user_group_text = format!("User: {} • Group: {}", share.force_user, share.force_group);
                         let user_group_row = adw::ActionRow::new();
-                        user_group_row.set_title(&gettext("User & Group"));
+                        user_group_row.set_title(&gettext("User &amp; Group"));
                         user_group_row.set_subtitle(&user_group_text);
                         group.add(&user_group_row);
 

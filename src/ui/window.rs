@@ -1,5 +1,5 @@
 use crate::config::AppConfig;
-use crate::ui::dialogs::{AddShareDialog, ListSharesDialog, WelcomeDialog};
+use crate::ui::dialogs::{AddShareDialog, ListSharesDialog,RemoteListSharesDialog, WelcomeDialog};
 use gettextrs::gettext;
 use gtk4::prelude::*;
 use gtk4::{gio, glib};
@@ -73,24 +73,27 @@ impl SambaShareManagerWindow {
         title_label.add_css_class("title-1");
         content_box.append(&title_label);
 
-        // Subtitle
-        let subtitle = gtk4::Label::new(Some(&gettext("Manage your Samba shares on NixOS")));
-        subtitle.add_css_class("title-3");
-        subtitle.set_margin_top(12);
-        content_box.append(&subtitle);
+        
+        //----------local samba share
 
-        // Button box
+        // Subtitle
+        let subtitle = gtk4::Label::new(Some(&gettext("Manage your computer samba shares")));
+        subtitle.add_css_class("title-4");
+        subtitle.set_margin_top(22);
+        content_box.append(&subtitle);
+        
+        // local share Button box
         let button_box = gtk4::Box::new(gtk4::Orientation::Horizontal, 12);
         button_box.set_halign(gtk4::Align::Center);
-        button_box.set_margin_top(32);
+        button_box.set_margin_top(2);
 
         // List Current Shares button
-        let list_shares_button = gtk4::Button::with_label(&gettext("List Current Shares"));
+        let list_shares_button = gtk4::Button::with_label(&gettext("List"));
         list_shares_button.add_css_class("pill");
         list_shares_button.add_css_class("suggested-action");
 
         // Setup New Share button
-        let setup_share_button = gtk4::Button::with_label(&gettext("Setup New Share"));
+        let setup_share_button = gtk4::Button::with_label(&gettext("Setup New"));
         setup_share_button.add_css_class("pill");
         setup_share_button.add_css_class("suggested-action");
 
@@ -98,22 +101,68 @@ impl SambaShareManagerWindow {
         button_box.append(&setup_share_button);
         content_box.append(&button_box);
 
+        //----------remote samba share
+
+        // Subtitle
+        let remote_subtitle = gtk4::Label::new(Some(&gettext("Manage your remote samba shares")));
+        remote_subtitle.add_css_class("title-4");
+        remote_subtitle.set_margin_top(22);
+        content_box.append(&remote_subtitle);
+
+        // remote share Button box
+        let remote_button_box = gtk4::Box::new(gtk4::Orientation::Horizontal, 12);
+        remote_button_box.set_halign(gtk4::Align::Center);
+        remote_button_box.set_margin_top(2);
+
+        // List Current Shares button
+        let remote_list_shares_button = gtk4::Button::with_label(&gettext("List"));
+        remote_list_shares_button.add_css_class("pill");
+        remote_list_shares_button.add_css_class("suggested-action");
+
+        // Setup New Share button
+        let remote_setup_share_button = gtk4::Button::with_label(&gettext("Setup New"));
+        remote_setup_share_button.add_css_class("pill");
+        remote_setup_share_button.add_css_class("suggested-action");
+
+        remote_button_box.append(&remote_list_shares_button);
+        remote_button_box.append(&remote_setup_share_button);
+        content_box.append(&remote_button_box);
+
+
+
         // Wrap content in toast overlay
         toast_overlay.set_child(Some(&content_box));
         main_box.append(&toast_overlay);
 
         // Connect button signals
+        //local
         let window_clone_for_list = window.clone();
         list_shares_button.connect_clicked(move |_| {
             let dialog = ListSharesDialog::new();
             dialog.present(Some(&window_clone_for_list));
         });
 
-        let window_clone = window.clone();
+        let window_clone_for_setup = window.clone();
         setup_share_button.connect_clicked(move |_| {
             let dialog = AddShareDialog::new();
-            dialog.present(Some(&window_clone));
+            dialog.present(Some(&window_clone_for_setup));
         });
+
+        //remote
+        
+        let window_clone_for_remote_list = window.clone();
+        remote_list_shares_button.connect_clicked(move |_| {
+            let dialog = RemoteListSharesDialog::new();
+            dialog.present(Some(&window_clone_for_remote_list));
+        });
+
+        /*
+        let window_clone_for_remote_setup = window.clone();
+        setup_share_button.connect_clicked(move |_| {
+            let dialog = RemoteAddShareDialog::new();
+            dialog.present(Some(&window_clone_for_remote_setup));
+        });
+         */ 
 
         window.set_content(Some(&main_box));
 

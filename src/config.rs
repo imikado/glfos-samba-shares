@@ -38,7 +38,9 @@ impl AppConfig {
         match fs::read_to_string(&self.config_file) {
             Ok(content) => {
                 // Look for "hide_welcome=true" line
-                !content.lines().any(|line| line.trim() == "hide_welcome=true")
+                !content
+                    .lines()
+                    .any(|line| line.trim() == "hide_welcome=true")
             }
             Err(_) => true, // Default to showing welcome on error
         }

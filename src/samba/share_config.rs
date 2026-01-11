@@ -1,7 +1,7 @@
+use rnix::{Root, SyntaxKind, SyntaxNode};
 use std::collections::HashMap;
 use std::fs;
 use std::process::Command;
-use rnix::{Root, SyntaxKind, SyntaxNode};
 
 #[derive(Debug, Clone)]
 pub struct SambaShareConfig {
@@ -59,13 +59,16 @@ impl SambaShareConfig {
                             shares.push(SambaShareConfig {
                                 name,
                                 path: props.get("path").cloned().unwrap_or_default(),
-                                browsable: props.get("browseable")
+                                browsable: props
+                                    .get("browseable")
                                     .map(|v| v == "yes")
                                     .unwrap_or(true),
-                                read_only: props.get("read only")
+                                read_only: props
+                                    .get("read only")
                                     .map(|v| v == "yes")
                                     .unwrap_or(false),
-                                guest_ok: props.get("guest ok")
+                                guest_ok: props
+                                    .get("guest ok")
                                     .map(|v| v == "yes")
                                     .unwrap_or(false),
                                 force_user: props.get("force user").cloned().unwrap_or_default(),
@@ -176,7 +179,9 @@ impl SambaShareConfig {
                 fs::write(Self::CONFIG_PATH, new_content)
                     .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
             } else {
-                return Err("Could not find suitable location to add services.samba section".to_string());
+                return Err(
+                    "Could not find suitable location to add services.samba section".to_string(),
+                );
             }
         }
 
@@ -227,8 +232,9 @@ impl SambaShareConfig {
                             let after = &content[end..];
                             let new_content = format!("{}{}{}", before, share_config, after);
 
-                            fs::write(Self::CONFIG_PATH, new_content)
-                                .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+                            fs::write(Self::CONFIG_PATH, new_content).map_err(|e| {
+                                format!("Failed to write {}: {}", Self::CONFIG_PATH, e)
+                            })?;
 
                             return Ok(());
                         }
@@ -257,7 +263,9 @@ fn find_samba_settings(node: &SyntaxNode) -> Option<SyntaxNode> {
                         for value_child in child.children() {
                             if value_child.kind() == SyntaxKind::NODE_ATTR_SET {
                                 // Look for the "settings" entry inside this attrset
-                                if let Some(settings_attrset) = find_direct_attrset(&value_child, "settings") {
+                                if let Some(settings_attrset) =
+                                    find_direct_attrset(&value_child, "settings")
+                                {
                                     return Some(settings_attrset);
                                 }
                             }

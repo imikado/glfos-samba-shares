@@ -17,6 +17,7 @@
   gtk4,
   polkit,
   gobject-introspection,
+  gsettings-desktop-schemas,
   parted,
   e2fsprogs,
   util-linux,
@@ -56,6 +57,7 @@ stdenv.mkDerivation rec {
     glib
     librsvg
     polkit
+    gsettings-desktop-schemas
     e2fsprogs
     util-linux
   ];

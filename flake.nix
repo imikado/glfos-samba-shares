@@ -34,6 +34,7 @@
               pkg-config
               glib
               gobject-introspection
+              gsettings-desktop-schemas
               polkit
               parted
               e2fsprogs
@@ -42,6 +43,9 @@
 
             # Environment variables for development
             RUST_SRC_PATH = "${pkgs.rust.packages.stable.rustPlatform.rustLibSrc}";
+
+            # GSettings schemas
+            XDG_DATA_DIRS = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}:${pkgs.gtk4}/share/gsettings-schemas/${pkgs.gtk4.name}:$XDG_DATA_DIRS";
           };
         }
       );

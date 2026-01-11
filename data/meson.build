@@ -3,15 +3,15 @@ subdir('icons')
 gnome = import('gnome')
 
 configure_file(
-  input: 'org.dupot.sambasharemanager.in',
-  output: 'org.dupot.sambasharemanager.policy',
+  input: 'org.dupot.samba-shares.desktop.in',
+  output: 'org.dupot.samba-shares.desktop.policy',
   configuration: conf,
   install_dir: datadir / 'polkit-1' / 'actions'
 )
 
 configure_file(
-  input: 'samba-share.desktop.in',
-  output: 'samba-share.desktop',
+  input: 'samba-shares.desktop.in',
+  output: 'samba-shares.desktop.desktop',
   configuration: conf,
   install_dir: datadir / 'applications'
 )

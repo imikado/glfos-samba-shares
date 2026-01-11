@@ -10,8 +10,8 @@ configure_file(
 )
 
 configure_file(
-  input: 'samba-shares.desktop.in',
-  output: 'samba-shares.desktop.desktop',
+  input: 'org.dupot.samba-shares.desktop.in',
+  output: 'org.dupot.samba-shares.desktop',
   configuration: conf,
   install_dir: datadir / 'applications'
 )

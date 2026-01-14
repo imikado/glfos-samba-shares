@@ -45,128 +45,262 @@ impl RemoteSambaShareConfig {
 
         let mut shares = Vec::new();
 
-        //fileSystems
-
-        // Find fileSystems attrset
-        if let Some(file_systems_attrset) = find_file_systems_root(&root) {
-            // Iterate through all filesystem entries
-            for child in file_systems_attrset.children() {
-                if child.kind() == SyntaxKind::NODE_ATTRPATH_VALUE {
-                    // Get the mount point (e.g., "/media/blender")
-                    if let Some(mount_point) = get_attrpath_name(&child) {
-                        // Get the attrset with device, fsType, options
-                        let mut device = String::new();
-                        let mut fs_type = String::new();
-                        let mut options_list: Vec<String> = Vec::new();
-
-                        // Parse the filesystem entry attributes
-                        for attr_child in child.children() {
-                            if attr_child.kind() == SyntaxKind::NODE_ATTR_SET {
-                                for entry in attr_child.children() {
-                                    if entry.kind() == SyntaxKind::NODE_ATTRPATH_VALUE {
-                                        if let Some(key) = get_attrpath_name(&entry) {
-                                            match key.as_str() {
-                                                "device" => {
-                                                    device =
-                                                        get_attrvalue(&entry).unwrap_or_default();
-                                                }
-                                                "fsType" => {
-                                                    fs_type =
-                                                        get_attrvalue(&entry).unwrap_or_default();
-                                                }
-                                                "options" => {
-                                                    options_list = get_attrvalue_list(&entry)
-                                                        .unwrap_or_default();
-                                                }
-                                                _ => {}
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        // Only process CIFS/SMB shares
-                        if fs_type == "cifs" {
-                            // Extract credentials from options (first item starting with "credentials=")
-                            let credentials = options_list
-                                .iter()
-                                .find(|opt| opt.starts_with("credentials="))
-                                .map(|opt| {
-                                    opt.strip_prefix("credentials=").unwrap_or("").to_string()
-                                })
-                                .unwrap_or_default();
-
-                            // Extract uid and gid from options
-                            let uid = options_list
-                                .iter()
-                                .find(|opt| opt.starts_with("uid="))
-                                .and_then(|opt| opt.strip_prefix("uid="))
-                                .unwrap_or("1000");
-
-                            let gid = options_list
-                                .iter()
-                                .find(|opt| opt.starts_with("gid="))
-                                .and_then(|opt| opt.strip_prefix("gid="))
-                                .unwrap_or("100");
-
-                            shares.push(RemoteSambaShareConfig {
-                                name: mount_point,
-                                remote_path: device,
-                                fs_type,
-                                option_credentials: credentials,
-                                force_user: uid.to_string(),
-                                force_group: gid.to_string(),
-                            });
-                        }
-                    }
-                }
-            }
-        }
+        // Search recursively for fileSystems."/mount/point" entries
+        find_filesystem_entries(&root, &mut shares);
 
         Ok(shares)
     }
 
     /// Write a new remote filesystem configuration to NixOS
     pub fn write(&self) -> Result<(), String> {
-        // TODO: Implement writing fileSystems entries
-        Err("Write operation not yet implemented for remote shares".to_string())
+        let mut content = fs::read_to_string(Self::CONFIG_PATH)
+            .map_err(|e| format!("Failed to read {}: {}", Self::CONFIG_PATH, e))?;
+
+        // Build the options list
+        let mut options = Vec::new();
+        if !self.option_credentials.is_empty() {
+            options.push(format!("\"credentials={}\"", self.option_credentials));
+        }
+        options.push("\"x-systemd.automount\"".to_string());
+        options.push("\"noauto\"".to_string());
+        options.push("\"x-systemd.idle-timeout=300\"".to_string());
+        options.push("\"x-systemd.device-timeout=10s\"".to_string());
+        options.push("\"x-systemd.mount-timeout=10s\"".to_string());
+        if !self.force_user.is_empty() {
+            options.push(format!("\"uid={}\"", self.force_user));
+        }
+        if !self.force_group.is_empty() {
+            options.push(format!("\"gid={}\"", self.force_group));
+        }
+
+        // Build the new entry
+        let new_entry = format!(
+            r#"fileSystems."{}" = {{
+  device = "{}";
+  fsType = "{}";
+  options = [
+    {}
+  ];
+}};
+
+"#,
+            self.name,
+            self.remote_path,
+            self.fs_type,
+            options.join("\n    ")
+        );
+
+        // Find where to insert (before the closing brace of the module)
+        // Look for the last closing brace
+        if let Some(last_brace_pos) = content.rfind('}') {
+            content.insert_str(last_brace_pos, &new_entry);
+        } else {
+            return Err("Could not find insertion point in config file".to_string());
+        }
+
+        // Write back to file
+        fs::write(Self::CONFIG_PATH, content)
+            .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+
+        Ok(())
     }
 
     /// Update an existing remote filesystem configuration
     pub fn update(&self, old_name: &str) -> Result<(), String> {
-        // TODO: Implement updating fileSystems entries
-        Err("Update operation not yet implemented for remote shares".to_string())
+        let mut content = fs::read_to_string(Self::CONFIG_PATH)
+            .map_err(|e| format!("Failed to read {}: {}", Self::CONFIG_PATH, e))?;
+
+        // If name hasn't changed, update in place
+        // Otherwise, delete old entry and add new one
+        if old_name == self.name {
+            // Update in place using regex with multiline flag
+            // This pattern matches the entire fileSystems entry including nested braces
+            let pattern = format!(
+                r#"(?s)fileSystems\."{}"\s*=\s*\{{.*?\}};"#,
+                regex::escape(old_name)
+            );
+
+            let re = regex::Regex::new(&pattern)
+                .map_err(|e| format!("Failed to create regex: {}", e))?;
+
+            if !re.is_match(&content) {
+                return Err(format!("Could not find filesystem entry for '{}'", old_name));
+            }
+
+            // Build the options list
+            let mut options = Vec::new();
+            if !self.option_credentials.is_empty() {
+                options.push(format!("\"credentials={}\"", self.option_credentials));
+            }
+            options.push("\"x-systemd.automount\"".to_string());
+            options.push("\"noauto\"".to_string());
+            options.push("\"x-systemd.idle-timeout=300\"".to_string());
+            options.push("\"x-systemd.device-timeout=10s\"".to_string());
+            options.push("\"x-systemd.mount-timeout=10s\"".to_string());
+            if !self.force_user.is_empty() {
+                options.push(format!("\"uid={}\"", self.force_user));
+            }
+            if !self.force_group.is_empty() {
+                options.push(format!("\"gid={}\"", self.force_group));
+            }
+
+            // Build the replacement entry
+            let replacement = format!(
+                r#"fileSystems."{}" = {{
+  device = "{}";
+  fsType = "{}";
+  options = [
+    {}
+  ];
+}};"#,
+                self.name,
+                self.remote_path,
+                self.fs_type,
+                options.join("\n    ")
+            );
+
+            content = re.replace(&content, replacement.as_str()).to_string();
+        } else {
+            // Name changed - delete old and add new
+            self.delete(old_name)?;
+            return self.write();
+        }
+
+        // Write back to file
+        fs::write(Self::CONFIG_PATH, content)
+            .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+
+        Ok(())
+    }
+
+    /// Delete a remote filesystem configuration
+    fn delete(&self, name: &str) -> Result<(), String> {
+        let mut content = fs::read_to_string(Self::CONFIG_PATH)
+            .map_err(|e| format!("Failed to read {}: {}", Self::CONFIG_PATH, e))?;
+
+        // Delete the entry using regex with multiline flag
+        // (?s) enables dotall mode where . matches newlines
+        let pattern = format!(
+            r#"(?s)fileSystems\."{}"\s*=\s*\{{.*?\}};[\n\r]*"#,
+            regex::escape(name)
+        );
+
+        let re = regex::Regex::new(&pattern)
+            .map_err(|e| format!("Failed to create regex: {}", e))?;
+
+        if !re.is_match(&content) {
+            return Err(format!("Could not find filesystem entry for '{}'", name));
+        }
+
+        content = re.replace(&content, "").to_string();
+
+        // Write back to file
+        fs::write(Self::CONFIG_PATH, content)
+            .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+
+        Ok(())
     }
 }
 
-/// Find the root fileSystems attrset node
-fn find_file_systems_root(node: &SyntaxNode) -> Option<SyntaxNode> {
-    // Recursively search for fileSystems
-    for child in node.children() {
-        // Look for ATTRPATH_VALUE nodes
-        if child.kind() == SyntaxKind::NODE_ATTRPATH_VALUE {
-            // Check if this attrpath is "fileSystems"
-            for path_child in child.children() {
-                if path_child.kind() == SyntaxKind::NODE_ATTRPATH {
-                    let path_text = path_child.text().to_string().trim().to_string();
-                    // Check if this is the root fileSystems
-                    if path_text.contains("fileSystems") {
-                        // Return the ATTR_SET that contains all filesystem entries
+/// Recursively find all fileSystems entries in the AST
+/// Each entry is like: fileSystems."/media/blender" = { device = ...; fsType = ...; options = [...]; };
+fn find_filesystem_entries(node: &SyntaxNode, shares: &mut Vec<RemoteSambaShareConfig>) {
+    // Look for NODE_ATTRPATH_VALUE nodes
+    if node.kind() == SyntaxKind::NODE_ATTRPATH_VALUE {
+        // Check if this attrpath starts with "fileSystems"
+        for child in node.children() {
+            if child.kind() == SyntaxKind::NODE_ATTRPATH {
+                // Get the first identifier in the attrpath
+                let mut is_filesystems = false;
+                let mut mount_point = String::new();
 
-                        return Some(child);
+                for attrpath_child in child.children() {
+                    if attrpath_child.kind() == SyntaxKind::NODE_IDENT {
+                        let ident_text = attrpath_child.text().to_string();
+                        if ident_text == "fileSystems" {
+                            is_filesystems = true;
+                        }
+                    } else if attrpath_child.kind() == SyntaxKind::NODE_STRING {
+                        // This is the mount point (e.g., "/media/blender")
+                        let text = attrpath_child.text().to_string();
+                        mount_point = text.trim_matches('"').to_string();
                     }
                 }
-            }
-        }
 
-        // Recursively search
-        if let Some(found) = find_file_systems_root(&child) {
-            return Some(found);
+                // If this is a fileSystems entry, parse its value
+                if is_filesystems && !mount_point.is_empty() {
+                    // Find the attr set value
+                    for value_child in node.children() {
+                        if value_child.kind() == SyntaxKind::NODE_ATTR_SET {
+                            // Parse device, fsType, options from the attr set
+                            let mut device = String::new();
+                            let mut fs_type = String::new();
+                            let mut options_list: Vec<String> = Vec::new();
+
+                            for entry in value_child.children() {
+                                if entry.kind() == SyntaxKind::NODE_ATTRPATH_VALUE {
+                                    if let Some(key) = get_attrpath_name(&entry) {
+                                        match key.as_str() {
+                                            "device" => {
+                                                device = get_attrvalue(&entry).unwrap_or_default();
+                                            }
+                                            "fsType" => {
+                                                fs_type = get_attrvalue(&entry).unwrap_or_default();
+                                            }
+                                            "options" => {
+                                                options_list = get_attrvalue_list(&entry).unwrap_or_default();
+                                            }
+                                            _ => {}
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Only process CIFS/SMB shares
+                            if fs_type == "cifs" {
+                                // Extract credentials from options
+                                let credentials = options_list
+                                    .iter()
+                                    .find(|opt| opt.starts_with("credentials="))
+                                    .map(|opt| {
+                                        opt.strip_prefix("credentials=").unwrap_or("").to_string()
+                                    })
+                                    .unwrap_or_default();
+
+                                // Extract uid and gid from options
+                                let uid = options_list
+                                    .iter()
+                                    .find(|opt| opt.starts_with("uid="))
+                                    .and_then(|opt| opt.strip_prefix("uid="))
+                                    .unwrap_or("1000");
+
+                                let gid = options_list
+                                    .iter()
+                                    .find(|opt| opt.starts_with("gid="))
+                                    .and_then(|opt| opt.strip_prefix("gid="))
+                                    .unwrap_or("100");
+
+                                shares.push(RemoteSambaShareConfig {
+                                    name: mount_point.clone(),
+                                    remote_path: device,
+                                    fs_type,
+                                    option_credentials: credentials,
+                                    force_user: uid.to_string(),
+                                    force_group: gid.to_string(),
+                                });
+                            }
+                        }
+                    }
+                }
+                break; // Only need to check the first ATTRPATH child
+            }
         }
     }
 
-    None
+    // Recursively search children
+    for child in node.children() {
+        find_filesystem_entries(&child, shares);
+    }
 }
 
 /// Find a direct child attrset by name (not nested deeper)

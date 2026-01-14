@@ -36,9 +36,11 @@ nix develop
 # Compiler
 cargo build --release
 
-# Exécuter
-cargo run --release
+# Or manually with sudo, preserving environment
+sudo -E ./target/release/samba-share
 ```
+
+**Note:** The application needs root privileges to modify `/etc/nixos/customConfig/default.nix`. When running with `sudo`, you must preserve the `XDG_DATA_DIRS` environment variable to avoid GSettings schema errors. See [DEVELOPMENT.md](DEVELOPMENT.md) for more details.
 
 ## Testing
 

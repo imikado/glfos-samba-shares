@@ -1,5 +1,5 @@
 use crate::config::AppConfig;
-use crate::ui::dialogs::{AddShareDialog, ListSharesDialog,RemoteListSharesDialog, WelcomeDialog};
+use crate::ui::dialogs::{AddShareDialog, ListSharesDialog,RemoteListSharesDialog, WelcomeDialog,AddRemoteShareDialog};
 use gettextrs::gettext;
 use gtk4::prelude::*;
 use gtk4::{gio, glib};
@@ -156,13 +156,13 @@ impl SambaShareManagerWindow {
             dialog.present(Some(&window_clone_for_remote_list));
         });
 
-        /*
+        
         let window_clone_for_remote_setup = window.clone();
-        setup_share_button.connect_clicked(move |_| {
-            let dialog = RemoteAddShareDialog::new();
+        remote_setup_share_button.connect_clicked(move |_| {
+            let dialog = AddRemoteShareDialog::new();
             dialog.present(Some(&window_clone_for_remote_setup));
         });
-         */ 
+        
 
         window.set_content(Some(&main_box));
 

@@ -1,129 +1,343 @@
-# French translations for samba-share-manager package.
-# Copyright (C) 2025 THE samba-share-manager'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the samba-share-manager package.
-# Automatically generated, 2025.
+# French translations for samba-share package.
+# Copyright (C) 2025 THE samba-share's COPYRIGHT HOLDER
+# This file is distributed under the same license as the samba-share package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: samba-share-manager\n"
+"Project-Id-Version: samba-share 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-09 16:04+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"POT-Creation-Date: 2026-01-14 14:00+0100\n"
+"PO-Revision-Date: 2026-01-14 14:00+0100\n"
+"Last-Translator: \n"
+"Language-Team: French\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: data/ui/window.blp:16
-msgid "Please wait while your system is being rebuilt..."
-msgstr "Veuillez patienter le temps que votre système soit reconstruit..."
+# ============ Main Window ============
 
-#: data/ui/window.blp:21
-msgid ""
-"An error happened while rebuilding your system. Be aware and check your nix "
-"configuration !"
-msgstr ""
-"Une erreur est survenue lors de la reconstruction de votre système. Faites "
-"attention et vérifiez votre configuration Nix !"
+msgid "Samba Share Manager"
+msgstr "Gestionnaire de partages Samba"
 
-#: data/ui/disk.blp:22
-msgid "Manage"
-msgstr "Gérer"
+msgid "Configure local and remote network shares"
+msgstr "Configurer les partages réseau locaux et distants"
 
-#: data/ui/disks.blp:23
-msgid "Save configuration"
-msgstr "Sauvegarder la configuration"
+msgid "Local Shares"
+msgstr "Partages locaux"
 
-#: data/ui/save_dialog.blp:5
-msgid ""
-"You made some configuration changes which need to be saved. Are you sure you "
-"want to exit the app ?"
-msgstr ""
-"Vous avez fait des changements de configuration qui nécessitent d'être "
-"sauvegardés. Êtes-vous sûr de vouloir quitter l'application ?"
+msgid "Share folders from this computer on the network"
+msgstr "Partager des dossiers de cet ordinateur sur le réseau"
 
-#: data/ui/save_dialog.blp:7
-msgid "Stay"
-msgstr "Rester"
+msgid "Manage Local Shares"
+msgstr "Gérer les partages locaux"
 
-#: data/ui/save_dialog.blp:8
-msgid "Exit"
-msgstr "Quitter"
+msgid "View, edit, and delete existing shares"
+msgstr "Voir, modifier et supprimer les partages existants"
 
-#: data/ui/manage_disk_add_mount_row.blp:5
-msgid "Mount point path"
-msgstr "Chemin du point de montage"
+msgid "Add New Share"
+msgstr "Ajouter un nouveau partage"
 
-#: data/ui/manage_disk.blp:22
-msgid "Mount points"
-msgstr "Points de montage"
+msgid "Create a new folder share"
+msgstr "Créer un nouveau partage de dossier"
 
-#: data/ui/welcome_dialog.blp:30
-msgid "Welcome to Samba Share Manager."
-msgstr "Bienvenue sur Samba Share Manager."
+msgid "Remote Shares"
+msgstr "Partages distants"
 
-#: data/ui/welcome_dialog.blp:36
-msgid ""
-"This tool helps you manage your Samba shares.\n"
-"More features will be available in the future!"
-msgstr ""
-"Cet outil vous aide à gérer vos partages Samba.\n"
-"Plus de fonctionnalités seront disponibles à l'avenir !"
+msgid "Connect to shares on other computers"
+msgstr "Se connecter aux partages sur d'autres ordinateurs"
 
-#: data/ui/welcome_dialog.blp:45
-msgid "Let's start !"
-msgstr "C'est parti !"
+msgid "Manage Remote Shares"
+msgstr "Gérer les partages distants"
 
-#: sambasharemanager/dialogs/manage_disk.py:21
-msgid "No mount points were detected"
-msgstr "Aucun point de montage détecté"
+msgid "View, edit, mount, and unmount remote shares"
+msgstr "Voir, modifier, monter et démonter les partages distants"
 
-#: src/ui/dialogs/manage_disk.rs:251
-msgid "Confirm mount point addition"
-msgstr "Confirmer l'ajout du point de montage"
+msgid "Add New Remote Share"
+msgstr "Ajouter un nouveau partage distant"
 
-#: src/ui/dialogs/manage_disk.rs:255
-msgid "Do you really want to add the mount point '%s'?"
-msgstr "Voulez-vous vraiment ajouter le point de montage '%s' ?"
+msgid "Connect to a share on another computer"
+msgstr "Se connecter à un partage sur un autre ordinateur"
 
-#: src/ui/dialogs/manage_disk.rs:256
-msgid "This action will save the configuration and rebuild the NixOS system."
-msgstr "Cette action va sauvegarder la configuration et reconstruire le système NixOS."
+msgid "About NixOS Integration"
+msgstr "À propos de l'intégration NixOS"
 
-#: src/ui/dialogs/manage_disk.rs:260
-msgid "Cancel"
-msgstr "Annuler"
+msgid "Changes are saved to /etc/nixos/customConfig/default.nix"
+msgstr "Les modifications sont enregistrées dans /etc/nixos/customConfig/default.nix"
 
-#: src/ui/dialogs/manage_disk.rs:261
-msgid "Confirm"
-msgstr "Confirmer"
-
-#~ msgid "Be ready to manage your shares like a pro!"
-#~ msgstr "Prêt à gérer vos partages comme un pro !"
-
-#: src/ui/window.rs:53
 msgid "Rebuilding NixOS configuration..."
 msgstr "Reconstruction de la configuration NixOS en cours..."
 
-#: src/ui/window.rs:56
 msgid "Failed to rebuild NixOS configuration"
 msgstr "Échec de la reconstruction de la configuration NixOS"
 
-#: src/ui/dialogs/manage_disk.rs:206
-msgid "Confirm mount point removal"
-msgstr "Confirmer la suppression du point de montage"
+# ============ Welcome Dialog ============
 
-#: src/ui/dialogs/manage_disk.rs:209
-msgid "Do you really want to remove the mount point '%s'?"
-msgstr "Voulez-vous vraiment supprimer le point de montage '%s' ?"
+msgid "Welcome to Samba Share Manager"
+msgstr "Bienvenue dans le gestionnaire de partages Samba"
 
-#: src/ui/dialogs/welcome.rs:22
+msgid "This application helps you manage your Samba shares on NixOS"
+msgstr "Cette application vous aide à gérer vos partages Samba sur NixOS"
+
 msgid "Don't show this dialog again"
 msgstr "Ne plus afficher ce dialogue"
 
-#: src/ui/dialogs/welcome.rs:31
 msgid "Continue to Application"
 msgstr "Continuer vers l'application"
+
+# ============ List Shares Dialog ============
+
+msgid "Samba Shares"
+msgstr "Partages Samba"
+
+msgid "Close"
+msgstr "Fermer"
+
+msgid "Refresh"
+msgstr "Actualiser"
+
+msgid "No Shares Configured"
+msgstr "Aucun partage configuré"
+
+msgid "Click 'Setup New Share' to add your first share"
+msgstr "Cliquez sur 'Nouveau partage' pour ajouter votre premier partage"
+
+msgid "Settings"
+msgstr "Paramètres"
+
+msgid "Edit"
+msgstr "Modifier"
+
+msgid "Error Loading Shares"
+msgstr "Erreur lors du chargement des partages"
+
+msgid "Please close and reopen to refresh"
+msgstr "Veuillez fermer et rouvrir pour actualiser"
+
+# ============ Add/Edit Share Dialog ============
+
+msgid "Setup New Samba Share"
+msgstr "Configurer un nouveau partage Samba"
+
+msgid "Edit Samba Share"
+msgstr "Modifier le partage Samba"
+
+msgid "Basic Information"
+msgstr "Informations de base"
+
+msgid "Share Name"
+msgstr "Nom du partage"
+
+msgid "Path"
+msgstr "Chemin"
+
+msgid "Browse..."
+msgstr "Parcourir..."
+
+msgid "Permissions"
+msgstr "Permissions"
+
+msgid "Browsable"
+msgstr "Visible"
+
+msgid "Share is visible in network browsing"
+msgstr "Le partage est visible dans la navigation réseau"
+
+msgid "Read Only"
+msgstr "Lecture seule"
+
+msgid "Users can only read files"
+msgstr "Les utilisateurs ne peuvent que lire les fichiers"
+
+msgid "Guest OK"
+msgstr "Accès invité"
+
+msgid "Allow guest access without password"
+msgstr "Autoriser l'accès invité sans mot de passe"
+
+msgid "User &amp; Group Settings"
+msgstr "Paramètres utilisateur et groupe"
+
+msgid "Force User"
+msgstr "Forcer l'utilisateur"
+
+msgid "Force all file operations as this user"
+msgstr "Forcer toutes les opérations de fichiers en tant que cet utilisateur"
+
+msgid "Force Group"
+msgstr "Forcer le groupe"
+
+msgid "Force all file operations as this group"
+msgstr "Forcer toutes les opérations de fichiers en tant que ce groupe"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Add Share"
+msgstr "Ajouter le partage"
+
+msgid "Save Changes"
+msgstr "Enregistrer les modifications"
+
+msgid "Select Folder"
+msgstr "Sélectionner un dossier"
+
+msgid "Share name is required"
+msgstr "Le nom du partage est requis"
+
+msgid "Path is required"
+msgstr "Le chemin est requis"
+
+msgid "Share added successfully. Please rebuild NixOS to apply changes."
+msgstr "Partage ajouté avec succès. Veuillez reconstruire NixOS pour appliquer les modifications."
+
+msgid "Share updated successfully. Please rebuild NixOS to apply changes."
+msgstr "Partage mis à jour avec succès. Veuillez reconstruire NixOS pour appliquer les modifications."
+
+msgid "Failed to add share"
+msgstr "Échec de l'ajout du partage"
+
+msgid "Failed to update share"
+msgstr "Échec de la mise à jour du partage"
+
+# ============ Remote Shares Dialog ============
+
+msgid "Remote Samba Shares"
+msgstr "Partages Samba distants"
+
+msgid "Add Remote Share"
+msgstr "Ajouter un partage distant"
+
+msgid "Mounted"
+msgstr "Monté"
+
+msgid "Not mounted"
+msgstr "Non monté"
+
+msgid "Remote Path"
+msgstr "Chemin distant"
+
+msgid "Mount Point"
+msgstr "Point de montage"
+
+msgid "Type"
+msgstr "Type"
+
+msgid "Options"
+msgstr "Options"
+
+msgid "Mount"
+msgstr "Monter"
+
+msgid "Unmount"
+msgstr "Démonter"
+
+msgid "Share unmounted successfully"
+msgstr "Partage démonté avec succès"
+
+msgid "Unmount failed"
+msgstr "Échec du démontage"
+
+msgid "Error"
+msgstr "Erreur"
+
+msgid "Mount requires credentials. Use 'sudo mount -t cifs ...' or nixos-rebuild."
+msgstr "Le montage nécessite des identifiants. Utilisez 'sudo mount -t cifs ...' ou nixos-rebuild."
+
+msgid "Configure remote shares in your NixOS configuration"
+msgstr "Configurez les partages distants dans votre configuration NixOS"
+
+# ============ Add/Edit Remote Share Dialog ============
+
+msgid "Add Remote Samba Share"
+msgstr "Ajouter un partage Samba distant"
+
+msgid "Edit Remote Samba Share"
+msgstr "Modifier le partage Samba distant"
+
+msgid "Local directory where the remote share will be mounted (e.g., /media/share)"
+msgstr "Répertoire local où le partage distant sera monté (ex: /media/partage)"
+
+msgid "SMB share path (e.g., //server/share)"
+msgstr "Chemin du partage SMB (ex: //serveur/partage)"
+
+msgid "Credentials File"
+msgstr "Fichier d'identifiants"
+
+msgid "Path to file containing username and password"
+msgstr "Chemin vers le fichier contenant l'identifiant et le mot de passe"
+
+msgid "Select Credentials File"
+msgstr "Sélectionner le fichier d'identifiants"
+
+msgid "Mount Options"
+msgstr "Options de montage"
+
+msgid "User ID (uid)"
+msgstr "ID utilisateur (uid)"
+
+msgid "The user ID that will own the mounted files"
+msgstr "L'ID utilisateur qui sera propriétaire des fichiers montés"
+
+msgid "Group ID (gid)"
+msgstr "ID groupe (gid)"
+
+msgid "The group ID that will own the mounted files"
+msgstr "L'ID groupe qui sera propriétaire des fichiers montés"
+
+msgid "Additional Options"
+msgstr "Options supplémentaires"
+
+msgid "These options will be automatically included in the configuration"
+msgstr "Ces options seront automatiquement incluses dans la configuration"
+
+msgid "These options are automatically included in the configuration"
+msgstr "Ces options sont automatiquement incluses dans la configuration"
+
+msgid "Auto-mount"
+msgstr "Montage automatique"
+
+msgid "Automatically mount on system startup"
+msgstr "Monter automatiquement au démarrage du système"
+
+msgid "Mount on access"
+msgstr "Monter à l'accès"
+
+msgid "Only mount when accessed (noauto)"
+msgstr "Monter uniquement lors de l'accès (noauto)"
+
+msgid "The new share will be added to your NixOS configuration. Run 'sudo nixos-rebuild switch' to apply changes."
+msgstr "Le nouveau partage sera ajouté à votre configuration NixOS. Exécutez 'sudo nixos-rebuild switch' pour appliquer les modifications."
+
+msgid "Changes will be written to your NixOS configuration. Run 'sudo nixos-rebuild switch' to apply them."
+msgstr "Les modifications seront écrites dans votre configuration NixOS. Exécutez 'sudo nixos-rebuild switch' pour les appliquer."
+
+msgid "Mount point is required"
+msgstr "Le point de montage est requis"
+
+msgid "Remote path is required"
+msgstr "Le chemin distant est requis"
+
+msgid "Mount point must be an absolute path (start with /)"
+msgstr "Le point de montage doit être un chemin absolu (commençant par /)"
+
+msgid "Remote path must start with // (e.g., //server/share)"
+msgstr "Le chemin distant doit commencer par // (ex: //serveur/partage)"
+
+msgid "User ID must be a number"
+msgstr "L'ID utilisateur doit être un nombre"
+
+msgid "Group ID must be a number"
+msgstr "L'ID groupe doit être un nombre"
+
+msgid "Share added successfully. Run 'sudo nixos-rebuild switch' to apply changes."
+msgstr "Partage ajouté avec succès. Exécutez 'sudo nixos-rebuild switch' pour appliquer les modifications."
+
+msgid "Share updated successfully. Run 'sudo nixos-rebuild switch' to apply changes."
+msgstr "Partage mis à jour avec succès. Exécutez 'sudo nixos-rebuild switch' pour appliquer les modifications."
+
+# ============ User & Group (escaped ampersand) ============
+
+msgid "User &amp; Group"
+msgstr "Utilisateur et groupe"

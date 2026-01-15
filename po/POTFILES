@@ -2,3 +2,9 @@ src/main.rs
 src/ui/app.rs
 src/ui/window.rs
 src/ui/dialogs/welcome.rs
+src/ui/dialogs/add_share.rs
+src/ui/dialogs/edit_share.rs
+src/ui/dialogs/list_shares.rs
+src/ui/dialogs/remote_list_shares.rs
+src/ui/dialogs/add_remote_share.rs
+src/ui/dialogs/edit_remote_share.rs

@@ -41,8 +41,12 @@ impl SambaShareManagerWindow {
         // Ensure window can be maximized properly
         window.set_default_size(800, 600);
 
-        // Create main layout
-        let main_box = gtk4::Box::new(gtk4::Orientation::Vertical, 0);
+        // Create toolbar view for proper adwaita layout
+        let toolbar_view = adw::ToolbarView::new();
+
+        // Create header bar
+        let header_bar = adw::HeaderBar::new();
+        toolbar_view.add_top_bar(&header_bar);
 
         // Create banners
         let rebuild_banner = adw::Banner::new(&gettext("Rebuilding NixOS configuration..."));
@@ -52,119 +56,155 @@ impl SambaShareManagerWindow {
         rebuild_error_banner.set_revealed(false);
         rebuild_error_banner.add_css_class("error");
 
-        main_box.append(&rebuild_banner);
-        main_box.append(&rebuild_error_banner);
-
-        // Create toolbar
-        let header_bar = adw::HeaderBar::new();
-        main_box.append(&header_bar);
+        toolbar_view.add_top_bar(&rebuild_banner);
+        toolbar_view.add_top_bar(&rebuild_error_banner);
 
         // Create toast overlay for notifications
         let toast_overlay = adw::ToastOverlay::new();
 
-        // Create content box
-        let content_box = gtk4::Box::new(gtk4::Orientation::Vertical, 20);
-        content_box.set_vexpand(true);
-        content_box.set_valign(gtk4::Align::Center);
-        content_box.set_halign(gtk4::Align::Center);
+        // Create scrolled window for content
+        let scrolled = gtk4::ScrolledWindow::builder()
+            .hexpand(true)
+            .vexpand(true)
+            .build();
+
+        // Create clamp for proper content width
+        let clamp = adw::Clamp::new();
+        clamp.set_maximum_size(600);
+        clamp.set_tightening_threshold(400);
+
+        // Main content box
+        let content_box = gtk4::Box::new(gtk4::Orientation::Vertical, 24);
+        content_box.set_margin_top(24);
+        content_box.set_margin_bottom(24);
+        content_box.set_margin_start(12);
+        content_box.set_margin_end(12);
+
+        // ============ Header Section ============
+        let header_box = gtk4::Box::new(gtk4::Orientation::Vertical, 8);
+        header_box.set_halign(gtk4::Align::Center);
+        header_box.set_margin_bottom(12);
+
+        // App icon
+        let icon = gtk4::Image::from_icon_name("folder-remote-symbolic");
+        icon.set_pixel_size(64);
+        icon.add_css_class("dim-label");
+        header_box.append(&icon);
 
         // Title
         let title_label = gtk4::Label::new(Some(&gettext("Samba Share Manager")));
         title_label.add_css_class("title-1");
-        content_box.append(&title_label);
-
-        
-        //----------local samba share
+        header_box.append(&title_label);
 
         // Subtitle
-        let subtitle = gtk4::Label::new(Some(&gettext("Manage your computer samba shares")));
-        subtitle.add_css_class("title-4");
-        subtitle.set_margin_top(22);
-        content_box.append(&subtitle);
-        
-        // local share Button box
-        let button_box = gtk4::Box::new(gtk4::Orientation::Horizontal, 12);
-        button_box.set_halign(gtk4::Align::Center);
-        button_box.set_margin_top(2);
+        let subtitle_label = gtk4::Label::new(Some(&gettext("Configure local and remote network shares")));
+        subtitle_label.add_css_class("dim-label");
+        header_box.append(&subtitle_label);
 
-        // List Current Shares button
-        let list_shares_button = gtk4::Button::with_label(&gettext("List"));
-        list_shares_button.add_css_class("pill");
-        list_shares_button.add_css_class("suggested-action");
+        content_box.append(&header_box);
 
-        // Setup New Share button
-        let setup_share_button = gtk4::Button::with_label(&gettext("Setup New"));
-        setup_share_button.add_css_class("pill");
-        setup_share_button.add_css_class("suggested-action");
+        // ============ Local Shares Section ============
+        let local_group = adw::PreferencesGroup::new();
+        local_group.set_title(&gettext("Local Shares"));
+        local_group.set_description(Some(&gettext("Share folders from this computer on the network")));
 
-        button_box.append(&list_shares_button);
-        button_box.append(&setup_share_button);
-        content_box.append(&button_box);
+        // List local shares row
+        let list_local_row = adw::ActionRow::new();
+        list_local_row.set_title(&gettext("Manage Local Shares"));
+        list_local_row.set_subtitle(&gettext("View, edit, and delete existing shares"));
+        list_local_row.set_activatable(true);
+        list_local_row.add_prefix(&gtk4::Image::from_icon_name("folder-symbolic"));
+        list_local_row.add_suffix(&gtk4::Image::from_icon_name("go-next-symbolic"));
+        local_group.add(&list_local_row);
 
-        //----------remote samba share
+        // Add local share row
+        let add_local_row = adw::ActionRow::new();
+        add_local_row.set_title(&gettext("Add New Share"));
+        add_local_row.set_subtitle(&gettext("Create a new folder share"));
+        add_local_row.set_activatable(true);
+        add_local_row.add_prefix(&gtk4::Image::from_icon_name("list-add-symbolic"));
+        add_local_row.add_suffix(&gtk4::Image::from_icon_name("go-next-symbolic"));
+        local_group.add(&add_local_row);
 
-        // Subtitle
-        let remote_subtitle = gtk4::Label::new(Some(&gettext("Manage your remote samba shares")));
-        remote_subtitle.add_css_class("title-4");
-        remote_subtitle.set_margin_top(22);
-        content_box.append(&remote_subtitle);
+        content_box.append(&local_group);
 
-        // remote share Button box
-        let remote_button_box = gtk4::Box::new(gtk4::Orientation::Horizontal, 12);
-        remote_button_box.set_halign(gtk4::Align::Center);
-        remote_button_box.set_margin_top(2);
+        // ============ Remote Shares Section ============
+        let remote_group = adw::PreferencesGroup::new();
+        remote_group.set_title(&gettext("Remote Shares"));
+        remote_group.set_description(Some(&gettext("Connect to shares on other computers")));
 
-        // List Current Shares button
-        let remote_list_shares_button = gtk4::Button::with_label(&gettext("List"));
-        remote_list_shares_button.add_css_class("pill");
-        remote_list_shares_button.add_css_class("suggested-action");
+        // List remote shares row
+        let list_remote_row = adw::ActionRow::new();
+        list_remote_row.set_title(&gettext("Manage Remote Shares"));
+        list_remote_row.set_subtitle(&gettext("View, edit, mount, and unmount remote shares"));
+        list_remote_row.set_activatable(true);
+        list_remote_row.add_prefix(&gtk4::Image::from_icon_name("network-server-symbolic"));
+        list_remote_row.add_suffix(&gtk4::Image::from_icon_name("go-next-symbolic"));
+        remote_group.add(&list_remote_row);
 
-        // Setup New Share button
-        let remote_setup_share_button = gtk4::Button::with_label(&gettext("Setup New"));
-        remote_setup_share_button.add_css_class("pill");
-        remote_setup_share_button.add_css_class("suggested-action");
+        // Add remote share row
+        let add_remote_row = adw::ActionRow::new();
+        add_remote_row.set_title(&gettext("Add New Remote Share"));
+        add_remote_row.set_subtitle(&gettext("Connect to a share on another computer"));
+        add_remote_row.set_activatable(true);
+        add_remote_row.add_prefix(&gtk4::Image::from_icon_name("list-add-symbolic"));
+        add_remote_row.add_suffix(&gtk4::Image::from_icon_name("go-next-symbolic"));
+        remote_group.add(&add_remote_row);
 
-        remote_button_box.append(&remote_list_shares_button);
-        remote_button_box.append(&remote_setup_share_button);
-        content_box.append(&remote_button_box);
+        content_box.append(&remote_group);
 
+        // ============ Info Section ============
+        let info_group = adw::PreferencesGroup::new();
 
+        let info_row = adw::ActionRow::new();
+        info_row.set_title(&gettext("About NixOS Integration"));
+        info_row.set_subtitle(&gettext("Changes are saved to /etc/nixos/customConfig/default.nix"));
+        info_row.add_prefix(&gtk4::Image::from_icon_name("dialog-information-symbolic"));
+        info_row.set_activatable(false);
+        info_group.add(&info_row);
 
-        // Wrap content in toast overlay
-        toast_overlay.set_child(Some(&content_box));
-        main_box.append(&toast_overlay);
+        content_box.append(&info_group);
 
-        // Connect button signals
-        //local
+        // Assemble the layout
+        clamp.set_child(Some(&content_box));
+        scrolled.set_child(Some(&clamp));
+        toast_overlay.set_child(Some(&scrolled));
+        toolbar_view.set_content(Some(&toast_overlay));
+
+        // Create references for button handlers
+        let list_shares_button = list_local_row.clone();
+        let setup_share_button = add_local_row.clone();
+        let remote_list_shares_button = list_remote_row.clone();
+        let remote_setup_share_button = add_remote_row.clone();
+
+        // Connect row activated signals
+        // Local shares
         let window_clone_for_list = window.clone();
-        list_shares_button.connect_clicked(move |_| {
+        list_shares_button.connect_activated(move |_| {
             let dialog = ListSharesDialog::new();
             dialog.present(Some(&window_clone_for_list));
         });
 
         let window_clone_for_setup = window.clone();
-        setup_share_button.connect_clicked(move |_| {
+        setup_share_button.connect_activated(move |_| {
             let dialog = AddShareDialog::new();
             dialog.present(Some(&window_clone_for_setup));
         });
 
-        //remote
-        
+        // Remote shares
         let window_clone_for_remote_list = window.clone();
-        remote_list_shares_button.connect_clicked(move |_| {
+        remote_list_shares_button.connect_activated(move |_| {
             let dialog = RemoteListSharesDialog::new();
             dialog.present(Some(&window_clone_for_remote_list));
         });
 
-        
         let window_clone_for_remote_setup = window.clone();
-        remote_setup_share_button.connect_clicked(move |_| {
+        remote_setup_share_button.connect_activated(move |_| {
             let dialog = AddRemoteShareDialog::new();
             dialog.present(Some(&window_clone_for_remote_setup));
         });
-        
 
-        window.set_content(Some(&main_box));
+        window.set_content(Some(&toolbar_view));
 
         let window_rc = Rc::new(Self {
             window: window.clone(),

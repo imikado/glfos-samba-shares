@@ -73,11 +73,8 @@ impl RemoteListSharesDialog {
         // Handle add button
         let window_for_add = window.clone();
         add_button.connect_clicked(move |_| {
-            eprintln!("Add remote share button clicked");
             let add_dialog = AddRemoteShareDialog::new();
-            eprintln!("Add remote share dialog created");
             add_dialog.present(Some(&window_for_add));
-            eprintln!("Add remote share dialog presented");
         });
 
         // Handle refresh button

@@ -1,3 +1,4 @@
+use crate::samba::sudo_write::write_with_sudo;
 use rnix::{Root, SyntaxKind, SyntaxNode};
 use std::collections::HashMap;
 use std::fs;
@@ -131,8 +132,7 @@ impl SambaShareConfig {
             let after = &content[before_closing..];
             let new_content = format!("{}\n{}\n{}", before, share_config, after);
 
-            fs::write(Self::CONFIG_PATH, new_content)
-                .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+            write_with_sudo(Self::CONFIG_PATH, &new_content)?;
         } else {
             // No settings section exists, create entire samba section
             let lines: Vec<&str> = content.lines().collect();
@@ -176,8 +176,7 @@ impl SambaShareConfig {
                 new_lines.insert(idx, samba_section);
                 let new_content = new_lines.join("\n");
 
-                fs::write(Self::CONFIG_PATH, new_content)
-                    .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+                write_with_sudo(Self::CONFIG_PATH, &new_content)?;
             } else {
                 return Err(
                     "Could not find suitable location to add services.samba section".to_string(),
@@ -232,9 +231,7 @@ impl SambaShareConfig {
                             let after = &content[end..];
                             let new_content = format!("{}{}{}", before, share_config, after);
 
-                            fs::write(Self::CONFIG_PATH, new_content).map_err(|e| {
-                                format!("Failed to write {}: {}", Self::CONFIG_PATH, e)
-                            })?;
+                            write_with_sudo(Self::CONFIG_PATH, &new_content)?;
 
                             return Ok(());
                         }

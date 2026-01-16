@@ -30,7 +30,7 @@ impl AddShareDialog {
         toolbar_view.add_top_bar(&header_bar);
 
         // Create preferences page for the form
-        let preferences_page = adw::PreferencesPage::new();
+        let preferences_page: libadwaita::PreferencesPage = adw::PreferencesPage::new();
 
         // Basic Information Group
         let basic_group = adw::PreferencesGroup::new();

@@ -1,7 +1,7 @@
+use crate::samba::sudo_write::write_with_sudo;
 use rnix::{Root, SyntaxKind, SyntaxNode};
 use std::collections::HashMap;
 use std::fs;
-use std::process::Command;
 
 #[derive(Debug, Clone)]
 pub struct RemoteSambaShareConfig {
@@ -98,9 +98,8 @@ impl RemoteSambaShareConfig {
             return Err("Could not find insertion point in config file".to_string());
         }
 
-        // Write back to file
-        fs::write(Self::CONFIG_PATH, content)
-            .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+        // Write back to file with sudo
+        write_with_sudo(Self::CONFIG_PATH, &content)?;
 
         Ok(())
     }
@@ -166,9 +165,8 @@ impl RemoteSambaShareConfig {
             return self.write();
         }
 
-        // Write back to file
-        fs::write(Self::CONFIG_PATH, content)
-            .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+        // Write back to file with sudo
+        write_with_sudo(Self::CONFIG_PATH, &content)?;
 
         Ok(())
     }
@@ -194,9 +192,8 @@ impl RemoteSambaShareConfig {
 
         content = re.replace(&content, "").to_string();
 
-        // Write back to file
-        fs::write(Self::CONFIG_PATH, content)
-            .map_err(|e| format!("Failed to write {}: {}", Self::CONFIG_PATH, e))?;
+        // Write back to file with sudo
+        write_with_sudo(Self::CONFIG_PATH, &content)?;
 
         Ok(())
     }
